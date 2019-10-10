@@ -98,8 +98,8 @@ public class ResponsivenessMonitor
         {
             // UI did not respond
             final boolean was_frozen = frozen.getAndSet(true);
-            if (! was_frozen)
-                reportUIFreeze();
+            //if (! was_frozen)
+                //reportUIFreeze();
             // else: Log only once, then note when UI resumes
         }
     }

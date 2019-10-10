@@ -24,6 +24,9 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 
 import org.csstudio.display.builder.model.properties.ScriptInfo;
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.Engine;
+import org.graalvm.polyglot.HostAccess;
 import org.phoebus.framework.jobs.NamedThreadFactory;
 
 /** Script (Jython, Javascript) Support
@@ -52,12 +55,15 @@ public class ScriptSupport
     private final PythonScriptSupport python;
     private final JythonScriptSupport jython;
     private final JavaScriptSupport javascript;
+    private final JavaScriptGraalSupport javascriptGraal;
 
     public ScriptSupport() throws Exception
     {
         python = new PythonScriptSupport(this);
         jython = new JythonScriptSupport(this);
         javascript = new JavaScriptSupport(this);
+
+        javascriptGraal = new JavaScriptGraalSupport(this);
     }
 
     /** Prepare script file for submission
@@ -80,7 +86,7 @@ public class ScriptSupport
         if (ScriptInfo.isJython(name))
             return jython.compile(path, name, script_stream);
         else if (ScriptInfo.isJavaScript(name))
-            return javascript.compile(name, script_stream);
+            return javascriptGraal.compile(name, script_stream);
         throw new Exception("Cannot compile '" + name + "'");
     }
 
