@@ -43,21 +43,11 @@ class JavaScriptSupport extends BaseScriptSupport
     public JavaScriptSupport(final ScriptSupport support) throws Exception
     {
         this.support = support;
-        // We always create the JS engine, even when not used, so disable
-        // 'Warning: Nashorn engine is planned to be removed from a future JDK release':
-        Context polyglotContext = Context.newBuilder()
-                .allowHostAccess(HostAccess.ALL)
-                .allowAllAccess(true)
-                .allowExperimentalOptions(true).option("js.nashorn-compat", "true")
-                .build();
-        System.setProperty("nashorn.args", "--no-deprecation-warning");
-        //engine = Objects.requireNonNull(new ScriptEngineManager().getEngineByName("graal.js"));
         engine = GraalJSScriptEngine.create(null,
                 Context.newBuilder("js")
                         .allowHostAccess(HostAccess.ALL)
                         .allowExperimentalOptions(true).option("js.nashorn-compat", "true")
                         .allowHostClassLookup(s -> true));
-        //engine.setContext(polyglotContext);
         bindings = engine.createBindings();
     }
 
@@ -70,8 +60,6 @@ class JavaScriptSupport extends BaseScriptSupport
     */
     public synchronized Script compile(final String name, final InputStream stream) throws Exception
     {
-        // End users who actually _use_ JS do need a warning that it might undergo changes
-        logger.log(Level.WARNING, "JavaScript support based on 'nashorn' is deprecated (" + name + ")");
         final CompiledScript code = ((Compilable) engine).compile(new InputStreamReader(stream));
         return new JavaScript(this, name, code);
     }
@@ -90,7 +78,6 @@ class JavaScriptSupport extends BaseScriptSupport
 
         return support.submit(() ->
         {
-            long start = System.currentTimeMillis();
             // Script may be queued again
             removeScheduleMarker(script);
             try
@@ -98,8 +85,6 @@ class JavaScriptSupport extends BaseScriptSupport
                 bindings.put("widget", widget);
                 bindings.put("pvs", pvs);
                 script.getCode().eval(bindings);
-                long stop = System.currentTimeMillis();
-                System.out.println("JS execution time " + (stop - start));
             }
             catch (final Throwable ex)
             {
