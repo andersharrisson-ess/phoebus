@@ -234,7 +234,7 @@ public class ResourceParser
      *  @param text Text that may contain '+' or '%20' etc.
      *  @return Decoded text
      */
-    private static String decode(final String text)
+    public static String decode(final String text)
     {
         if (text == null)
             return null;

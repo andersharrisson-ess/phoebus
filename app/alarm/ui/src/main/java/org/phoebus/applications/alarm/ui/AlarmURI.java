@@ -8,6 +8,9 @@
 package org.phoebus.applications.alarm.ui;
 
 import java.net.URI;
+import java.net.URL;
+import java.net.URLEncoder;
+import org.phoebus.framework.util.ResourceParser;
 
 /** Alarm URI helpers
  *
@@ -29,7 +32,8 @@ public class AlarmURI
      */
     public static URI createURI(final String server, final String config_name)
     {
-        return URI.create(SCHEMA + "://" + server + "/" + config_name);
+        return URI.create(SCHEMA + "://" + ResourceParser.encode(server + "/" + config_name));
+	//return URI.create(SCHEMA + "://" + URLEncoder.encode(server + "/" + config_name), "UTF_8");
     }
 
     /** Parse alarm configuration parameters from URI
@@ -41,15 +45,32 @@ public class AlarmURI
     {
         if (! SCHEMA.equals(resource.getScheme()))
             throw new Exception("Cannot parse " + resource + ", expecting " + SCHEMA + "://{host}:{port}/{config_name}");
-        // Default to port 9092
-        int port = resource.getPort();
-        if (port < 0)
-            port = 9092;
-        String config_name = resource.getPath();
+
+	String[] splitURI = (resource.toString()).split("://");
+	String decodedAuthorityPath = ResourceParser.decode(splitURI[1]);
+	//String decodedAuthorityPath = URLDecoder.decode(splitURI[1], "UTF_8");
+
+	// Re-create the URI with decoded authority & path
+	URI recResource = URI.create(SCHEMA + "://" + decodedAuthorityPath);
+
+	String config_name = recResource.getPath();
         if (config_name.startsWith("/"))
             config_name = config_name.substring(1);
         if (config_name.isEmpty())
             throw new Exception("Missing alarm config name in " + resource + ", expecting " + SCHEMA + "://{host}:{port}/{config_name}");
+
+	// Check if user provided multiple kafka hosts i.e. host1:port1,host2:port2,host3:port3
+	if (decodedAuthorityPath.contains(","))
+	{
+	    String[] splitAuthorityPath = decodedAuthorityPath.split("/");
+	    return new String[] { splitAuthorityPath[0], splitAuthorityPath[1] };
+	}
+
+        // Default to port 9092
+        int port = resource.getPort();
+        if (port < 0)
+            port = 9092;
+        
         return new String[] { resource.getHost() + ":" + port, config_name };
     }
 }
