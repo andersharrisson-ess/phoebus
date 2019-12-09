@@ -8,8 +8,7 @@
 package org.phoebus.applications.alarm.ui;
 
 import java.net.URI;
-import java.net.URL;
-import java.net.URLEncoder;
+
 import org.phoebus.framework.util.ResourceParser;
 
 /** Alarm URI helpers
@@ -33,7 +32,6 @@ public class AlarmURI
     public static URI createURI(final String server, final String config_name)
     {
         return URI.create(SCHEMA + "://" + ResourceParser.encode(server + "/" + config_name));
-	//return URI.create(SCHEMA + "://" + URLEncoder.encode(server + "/" + config_name), "UTF_8");
     }
 
     /** Parse alarm configuration parameters from URI
@@ -48,7 +46,6 @@ public class AlarmURI
 
 	String[] splitURI = (resource.toString()).split("://");
 	String decodedAuthorityPath = ResourceParser.decode(splitURI[1]);
-	//String decodedAuthorityPath = URLDecoder.decode(splitURI[1], "UTF_8");
 
 	// Re-create the URI with decoded authority & path
 	URI recResource = URI.create(SCHEMA + "://" + decodedAuthorityPath);
