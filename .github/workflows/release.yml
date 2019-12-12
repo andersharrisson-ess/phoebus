@@ -17,4 +17,4 @@ jobs:
     - name: Build and publish
       env:
         GITHUB_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-      run: mvn deploy --batch-mode -Dmaven.wagon.http.pool=false -DaltDeploymentRepository="github::default::https://maven.pkg.github.com/${GITHUB_REPOSITORY}" --settings .github/maven/settings.xml
+      run: mvn deploy --batch-mode -Dmaven.wagon.http.pool=false -DaltDeploymentRepository="github::default::https://maven.pkg.github.com/${GITHUB_REPOSITORY}" --settings .github/maven/settings.xml --projects org.phoebus:parent,org.phoebus:service-alarm-logger,org.phoebus:app-alarm-model,org.phoebus:core-framework,org.phoebus:core-util
