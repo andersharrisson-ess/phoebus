@@ -1,11 +1,6 @@
-name: Phoebus publish
+name: Phoebus build
 
-on:
-  push:
-    branches:
-      - master
-    tags:
-      - '*'
+on: [push, pull_request]
 
 jobs:
   build:
@@ -16,8 +11,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
-    - name: Build and publish
+    - name: Build
+      run: mvn --batch-mode install
+    - name: Publish
       env:
-        ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
-        ARTIFACTORY_API_KEY: ${{ secrets.ARTIFACTORY_API_KEY }}
-      run: mvn deploy --batch-mode --settings .github/maven/settings.xml
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: mvn --batch-mode -DskipTests deploy
+      if: ${{ github.repository == 'andersharrisson-ess/phoebus' && (github.ref == 'refs/heads/master' || github.ref == 'refs/tags/*') }}
