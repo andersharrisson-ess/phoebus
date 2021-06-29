@@ -17,6 +17,8 @@ jobs:
           server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      - name: debug
+        run: gpg --list-keys
       - name: Build and publish
         run: mvn --batch-mode -Pdocs,sign deploy
         env:
