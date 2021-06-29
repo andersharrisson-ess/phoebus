@@ -1,7 +1,11 @@
 name: Phoebus build
-
-on: [push, pull_request]
-
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,4 +21,4 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: mvn --batch-mode -DskipTests deploy
-      if: ${{ github.repository == 'ControlSystemStudio/phoebus' && (github.ref == 'refs/heads/master' || github.ref == 'refs/tags/*') }}
+      if: ${{ github.repository == 'ControlSystemStudio/phoebus' }}
